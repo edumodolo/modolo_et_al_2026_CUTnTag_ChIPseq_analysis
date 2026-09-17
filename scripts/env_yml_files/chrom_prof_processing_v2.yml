@@ -1,0 +1,49 @@
+name: chrom_prof_processing_v2
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  # ─── CORE DOWNLOAD & UTILS ────────────────
+  - sra-tools=3.2.1  # Pinned to avoid GLIBC_2.27 errors on CentOS/RHEL 7
+  - wget
+  - curl
+  - pigz
+  - coreutils
+
+  # ─── ALIGNMENT & BAM PROCESSING ───────────
+  - fastp
+  - bowtie2
+  - samtools
+  - bedtools
+  - pysam
+
+  # ─── VISUALIZATION & BIGWIGS ──────────────
+  - deeptools
+
+  # ─── UCSC LIFTOVER & TRACK TOOLS ──────────
+  - crossmap         # Added for hg19 -> hg38 bigWig liftovers
+  - ucsc-liftover
+  - ucsc-bedgraphtobigwig
+  - ucsc-wigtobigwig
+  - ucsc-bedclip
+  - ucsc-bedtobigbed
+  - ucsc-fetchchromsizes
+  - ucsc-bigwigmerge
+  - ucsc-bigwiginfo
+  - ucsc-bigwigtobedgraph
+
+  # ─── R & PLOTTING (For HOMER QC Script) ───
+  - r-base
+  - r-ggplot2
+  - r-dplyr
+  - r-readr
+  - r-patchwork
+  - r-tidyr
+  - r-scales
+
+  # ─── PYTHON & SCRIPTING ───────────────────
+  - python>=3.9
+  - numpy
+  - pandas
+  - matplotlib
