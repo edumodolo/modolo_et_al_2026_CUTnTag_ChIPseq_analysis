@@ -1,0 +1,55 @@
+# =============================================================================
+# Environment for the peak-overlap validation analysis
+#
+# Covers 03_peak_overlap_validation.sh: MACS2 and SEACR peak calling, fragment
+# bedgraph construction, bin/peak overlap counting, and the bar figure.
+#
+# Create and activate:
+#   conda config --set channel_priority strict     # once, recommended
+#   conda env create -f environment_peak_calling.yml
+#   conda activate peak_calling_analysis
+#
+# mamba is faster:
+#   mamba env create -f environment_peak_calling.yml
+#
+# HOMER is NOT installed here. findPeaks and pos2bed.pl come from your existing
+# HOMER installation, which stays on PATH after activating this environment
+# (conda prepends to PATH rather than replacing it). Verify with:
+#   command -v findPeaks pos2bed.pl
+# =============================================================================
+
+name: peak_calling_analysis
+
+channels:
+  - conda-forge
+  - bioconda
+
+dependencies:
+
+  # --- interpreter ------------------------------------------------------------
+  - r-base=4.3                # SEACR runs its own R script; also the bar figure
+
+  # --- peak callers -----------------------------------------------------------
+  - macs2=2.2.9.1             # both methods, narrow and broad modes
+  - seacr=1.3                 # CUT&Tag-specific caller; provides SEACR_1.3.sh
+                              # If it lands somewhere unexpected, point the
+                              # script at it: SEACR_CMD=/path/to/SEACR_1.3.sh
+
+  # --- genomics utilities -----------------------------------------------------
+  # bedtools does three separate jobs here: bamtobed -bedpe and genomecov build
+  # the fragment bedgraph SEACR consumes, merge/intersect build the reproducible
+  # peak sets, and intersect -u counts bin/peak overlaps. SEACR calls bedtools
+  # internally as well.
+  - bedtools>=2.31
+  - samtools>=1.19            # name-sorting BAMs before bamtobed -bedpe
+
+  # --- R: figure --------------------------------------------------------------
+  - r-ggplot2
+  - r-dplyr
+  - r-readr
+  - r-tidyr
+  - r-scales
+
+  # --- shell utilities --------------------------------------------------------
+  - gawk                      # numeric awk in the overlap and status splitting
+  - coreutils

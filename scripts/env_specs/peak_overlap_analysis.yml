@@ -1,0 +1,60 @@
+# =============================================================================
+# Environment for cnt_vs_encode_gc_dnase.sh
+#
+# Kept SEPARATE from peak_calling_analysis on purpose. Bioconda now builds
+# deepTools against NumPy 2, while MACS2 is a Cython extension compiled against
+# a specific NumPy ABI. Forcing both into one environment either fails to solve
+# or produces a MACS2 that imports NumPy and dies with
+#     ValueError: numpy.ufunc has the wrong size, try recompiling
+# Splitting them removes the conflict instead of negotiating with it, and leaves
+# the working peak-calling environment untouched.
+#
+# This script needs NONE of the peak callers: no MACS2, no SEACR, no samtools.
+# It only intersects existing peak files and reads bigWigs.
+#
+# Create and activate:
+#   conda config --set channel_priority strict     # once, recommended
+#   mamba env create -f environment_gc_dnase.yml
+#   conda activate gc_dnase_analysis
+#   bash cnt_vs_encode_gc_dnase.sh
+# =============================================================================
+name: peak_overlap_analysis
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  # --- interpreters -----------------------------------------------------------
+  - python=3.12
+  - r-base=4.3
+
+  # deepTools supplies multiBigwigSummary, the per-peak mean of the GC and
+  # DNase bigWigs. Current bioconda builds REQUIRE numpy >=2.0.0, so no
+  # downward pin here.
+  - deeptools>=3.5.6
+
+  # The upper bound is only to keep the solver away from NumPy 2.5 release
+  # candidates, which depend on a `_numpy_rc` marker package that is not in
+  # these channels and shows up as a confusing "nothing provides _numpy_rc"
+  # error. Raise it once 2.5 is a stable release.
+  - numpy>=2.0,<2.5
+
+  # --- genomics utilities -----------------------------------------------------
+  - bedtools>=2.31            # intersect -u/-v for the unique/shared subsets
+
+  # UCSC converters, needed ONCE to turn the hg19 GC wiggle into a bigWig.
+  # After hg19.gc5Base.bw exists the script stops checking for them.
+  - ucsc-fetchchromsizes
+  - ucsc-wigtobigwig
+
+  # --- R: figure --------------------------------------------------------------
+  # r-tidyverse rather than the individual packages: the script uses stringr
+  # (str_split, str_remove), purrr (map_dfr) and tibble alongside the usual
+  # ggplot2/dplyr/tidyr/readr.
+  - r-tidyverse
+  - r-patchwork               # four-panel assembly
+
+  # --- shell utilities --------------------------------------------------------
+  - gawk
+  - coreutils
+  - wget                      # all downloads
+  - gzip                      # gunzip for the ENCODE .bed.gz files
