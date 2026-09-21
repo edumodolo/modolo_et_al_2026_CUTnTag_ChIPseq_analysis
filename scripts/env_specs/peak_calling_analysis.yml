@@ -1,0 +1,42 @@
+# =============================================================================
+# Environment for the peak-overlap validation analysis
+#
+# Covers:
+# 04_peak_overlap_validation.sh: MACS2 peak calling, fragment bedgraph construction, 
+# bin/peak overlap counting, and the bar figure.
+#
+# =============================================================================
+
+name: peak_calling_analysis
+
+channels:
+  - conda-forge
+  - bioconda
+
+dependencies:
+
+  # --- interpreter ------------------------------------------------------------
+  - r-base=4.3                # SEACR runs its own R script; also the bar figure
+
+  # --- peak callers -----------------------------------------------------------
+  - macs2=2.2.9.1             # both methods, narrow and broad modes
+  - seacr=1.3                 
+
+  # --- genomics utilities -----------------------------------------------------
+  # bedtools does three separate jobs here: bamtobed -bedpe and genomecov build
+  # the fragment bedgraph SEACR consumes, merge/intersect build the reproducible
+  # peak sets, and intersect -u counts bin/peak overlaps. SEACR calls bedtools
+  # internally as well.
+  - bedtools>=2.31
+  - samtools>=1.19            # name-sorting BAMs before bamtobed -bedpe
+
+  # --- R: figure --------------------------------------------------------------
+  - r-ggplot2
+  - r-dplyr
+  - r-readr
+  - r-tidyr
+  - r-scales
+
+  # --- shell utilities --------------------------------------------------------
+  - gawk                      # numeric awk in the overlap and status splitting
+  - coreutils

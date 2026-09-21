@@ -1,0 +1,61 @@
+# =============================================================================
+# Environment for CUT&Tag, ChIP-seq, ATAC-seq processing (Run IDs to final bigwig, bam files, etc.)
+#
+# Covers:
+#   00_processing_chip_cnt_atac_data.sh              processes ChIP-seq/CUT&Tag/ATAC-seq samples from Run ID
+# 
+# NOTE: if you want to perform HOMER based QC analysis (i.e., generating nucleotide frequency plots), 
+# install HOMER and add to PATH, following 
+# instructions at http://homer.ucsd.edu/homer/introduction/install.html 
+#
+# =============================================================================
+
+name: chrom_prof_processing_v2
+channels:
+  - conda-forge
+  - bioconda
+  - defaults
+dependencies:
+  # ─── CORE DOWNLOAD & UTILS ────────────────
+  - sra-tools=3.2.1  
+  - wget
+  - curl
+  - pigz
+  - coreutils
+
+  # ─── ALIGNMENT & BAM PROCESSING ───────────
+  - fastp
+  - bowtie2
+  - samtools
+  - bedtools
+  - pysam
+
+  # ─── VISUALIZATION & BIGWIGS ──────────────
+  - deeptools
+
+  # ─── UCSC LIFTOVER & TRACK TOOLS ──────────
+  - crossmap         # Added for hg19 -> hg38 bigWig liftovers
+  - ucsc-liftover
+  - ucsc-bedgraphtobigwig
+  - ucsc-wigtobigwig
+  - ucsc-bedclip
+  - ucsc-bedtobigbed
+  - ucsc-fetchchromsizes
+  - ucsc-bigwigmerge
+  - ucsc-bigwiginfo
+  - ucsc-bigwigtobedgraph
+
+  # ─── R & PLOTTING (For HOMER QC Script) ───
+  - r-base
+  - r-ggplot2
+  - r-dplyr
+  - r-readr
+  - r-patchwork
+  - r-tidyr
+  - r-scales
+
+  # ─── PYTHON & SCRIPTING ───────────────────
+  - python>=3.9
+  - numpy
+  - pandas
+  - matplotlib
